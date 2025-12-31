@@ -4,12 +4,30 @@ let percent = document.getElementById("percent");
 
 // 定义update函数，用于更新倒计时和进度百分比
 function update() {
+    const festival = "春节";
     // 创建一个新的Date对象，表示当前时间
     let date = new Date();
-
+    let past_time = new Date(2025, 0, 29);
+    let future_time = new Date(2026, 1, 17);
+// 设置过去的时间戳（2024年3月10日）和未来的时间戳（2025年2月29日）
+    let past_timestamp = past_time.getTime();
+    let future_timestamp = future_time.getTime();
     // 计算距离下个月的第10天的天数
     // 当前日期到月底的天数加上下个月10号的天数
-    let day_counter = 31 - date.getDay();
+    let day_in_current_month = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+    let day_counter = (() => {
+        let result = day_in_current_month - date.getDate();
+        for (let origin_year = date.getFullYear(); origin_year < future_time.getFullYear(); origin_year++) {
+            for (let origin_month = 0; origin_month < future_time.getMonth(); origin_month++) {
+                let delta_date = ((year, month) => {
+                    return new Date(year, month + 1, 0).getDate();
+                })(origin_year, origin_month);
+                result += delta_date;
+            }
+        }
+        result += future_time.getDate();
+        return result
+    })();
 
     // 计算当前小时到23点的小时数
     let hour_counter = 23 - date.getHours();
@@ -31,9 +49,7 @@ function update() {
     // 将倒计时字符串设置到counter元素的innerText中
     counter.innerText = innerHtml;
 
-    // 设置过去的时间戳（2024年3月10日）和未来的时间戳（2025年2月29日）
-    let past_timestamp = new Date(2024, 2, 10).getTime();
-    let future_timestamp = new Date(2025, 1, 29).getTime();
+    
     // 获取当前时间的时间戳
     let now_timestamp = date.getTime();
 
@@ -41,6 +57,12 @@ function update() {
     let percent_num = (now_timestamp - past_timestamp) / (future_timestamp - past_timestamp);
     // 将百分比转换为字符串，并保留最多9位小数，然后设置到percent元素的innerText中
     percent.innerText = (percent_num * 100).toString().substring(0, 9) + "%";
+    let ice = document.getElementById("IceLiu_Forward");
+    ice.style.height = `${(1 - percent_num)*100}%`;
+    ice.style.top = `${percent_num*100}%`
+
+    let date_document = document.getElementById("date");
+    date_document.innerText = `${future_time.getFullYear()}年${future_time.getMonth() + 1}月${future_time.getDate()}日(${festival})`
 }
 
 
